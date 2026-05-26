@@ -1,0 +1,536 @@
+{
+	"info": {
+		"_postman_id": "b8e4f1a2-3c5d-4e6f-9a0b-1c2d3e4f5a6b",
+		"name": "Blockchain Network — EVM Service",
+		"description": "HTTP API for the single-chain EVM microservice (`evm.js`).\n\n**Setup:** Copy `.env.example` to `.env`, set `EVM_RPC_URL`, `EVM_PAID_RPC_URL`, `EVM_CHAIN_ID`, `EVM_PORT`, then run `npm start`.\n\n**Base URL:** Default `http://localhost:5000/api` (collection variable `base_url`).\n\n**Responses:** Most endpoints return JSON objects on success or the literal `false` on failure (HTTP 200).\n\n**History endpoints** require `EVM_PAID_RPC_URL`. Block scans are limited by `EVM_MAX_BLOCK_RANGE` (default 2000).\n\n**Security:** Send endpoints accept private keys in the body — use only on trusted networks.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000/api"
+		},
+		{
+			"key": "address",
+			"value": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
+		},
+		{
+			"key": "token_address",
+			"value": "0x337610d27c682E977C6a90AeAfb39f88bf6EB81"
+		},
+		{
+			"key": "private_key",
+			"value": ""
+		},
+		{
+			"key": "public_key",
+			"value": ""
+		},
+		{
+			"key": "to_address",
+			"value": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
+		},
+		{
+			"key": "amount",
+			"value": "0.001"
+		},
+		{
+			"key": "tx_hash",
+			"value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+		},
+		{
+			"key": "from_block_number",
+			"value": "1000000"
+		},
+		{
+			"key": "to_block_number",
+			"value": "1000010"
+		},
+		{
+			"key": "block_number",
+			"value": "1000000"
+		}
+	],
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Check status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": "{{base_url}}/check",
+						"description": "Service health. Returns `message`, `rpcConfigured`, `paidRpcConfigured`, `chainId`."
+					},
+					"response": []
+				},
+				{
+					"name": "Test (hello)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": "{{base_url}}/test",
+						"description": "Static hello response."
+					},
+					"response": []
+				},
+				{
+					"name": "Test RPC connectivity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/test",
+						"description": "Fetches latest block using `EVM_RPC_URL`. Returns `latestBlock` and `hash`."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wallet",
+			"item": [
+				{
+					"name": "Generate wallet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json && json.address) {",
+									"    pm.collectionVariables.set('address', json.address);",
+									"}",
+									"if (json && json.privateKey) {",
+									"    pm.collectionVariables.set('private_key', json.privateKey);",
+									"}",
+									"if (json && json.publicKey) {",
+									"    pm.collectionVariables.set('public_key', json.publicKey);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": "{{base_url}}/generate-wallet",
+						"description": "Creates a random wallet. Returns `address`, `privateKey`, `mnemonic`, `publicKey`."
+					},
+					"response": []
+				},
+				{
+					"name": "Get wallet from private key",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"privateKey\": \"{{private_key}}\"\n}"
+						},
+						"url": "{{base_url}}/get-wallet-from-private-key",
+						"description": "Derives wallet fields from a private key (with or without `0x` prefix)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get address from public key",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"publicKey\": \"{{public_key}}\"\n}"
+						},
+						"url": "{{base_url}}/get-address-from-public-key",
+						"description": "Computes EVM address from an uncompressed public key."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Address",
+			"item": [
+				{
+					"name": "Check address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"address\": \"{{address}}\"\n}"
+						},
+						"url": "{{base_url}}/check-address",
+						"description": "Returns `true` if the address is valid, otherwise `false`."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Balance",
+			"item": [
+				{
+					"name": "Get native balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"address\": \"{{address}}\"\n}"
+						},
+						"url": "{{base_url}}/get-native-balance",
+						"description": "Native coin balance (BNB, ETH, etc.) for the configured chain."
+					},
+					"response": []
+				},
+				{
+					"name": "Get token balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"address\": \"{{address}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
+						},
+						"url": "{{base_url}}/get-token-balance",
+						"description": "ERC-20 balance. Uses token `decimals()` when available."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Send",
+			"item": [
+				{
+					"name": "Send native balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"privateKey\": \"{{private_key}}\",\n    \"toAddress\": \"{{to_address}}\",\n    \"amount\": \"{{amount}}\"\n}"
+						},
+						"url": "{{base_url}}/send-native-balance",
+						"description": "Sends native coin. `amount` is a decimal string (e.g. `\"0.01\"`). **Destructive — uses real funds.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Send token balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"privateKey\": \"{{private_key}}\",\n    \"tokenAddress\": \"{{token_address}}\",\n    \"toAddress\": \"{{to_address}}\",\n    \"amount\": \"{{amount}}\"\n}"
+						},
+						"url": "{{base_url}}/send-token-balance",
+						"description": "ERC-20 transfer. **Destructive — uses real funds.**"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Block",
+			"item": [
+				{
+					"name": "Get latest block (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json && json.number !== undefined) {",
+									"    pm.collectionVariables.set('to_block_number', String(json.number));",
+									"    pm.collectionVariables.set('block_number', String(json.number));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": "{{base_url}}/get-latest-block",
+						"description": "Latest block number, hash, timestamp, transaction count."
+					},
+					"response": []
+				},
+				{
+					"name": "Get latest block (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": "{{base_url}}/get-latest-block",
+						"description": "Same as GET variant."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get native transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"txHash\": \"{{tx_hash}}\"\n}"
+						},
+						"url": "{{base_url}}/get-native-transaction",
+						"description": "Native transfer details. Requires mined transaction (receipt present)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get token transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"txHash\": \"{{tx_hash}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
+						},
+						"url": "{{base_url}}/get-token-transaction",
+						"description": "Parses ERC-20 Transfer events from a transaction receipt. Returns `tokenTransfers` array."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "History",
+			"item": [
+				{
+					"name": "Token transfer histories (block range)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"fromBlockNumber\": {{from_block_number}},\n    \"toBlockNumber\": {{to_block_number}}\n}"
+						},
+						"url": "{{base_url}}/get-token-transfer-histories-by-block-number",
+						"description": "ERC-20 Transfer logs via `EVM_PAID_RPC_URL`. Returns `transactions`, `last_block`.\n\nAlternative: use `blockNumber` alone for a single block instead of from/to."
+					},
+					"response": []
+				},
+				{
+					"name": "Token transfer histories (single block)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"blockNumber\": {{block_number}}\n}"
+						},
+						"url": "{{base_url}}/get-token-transfer-histories-by-block-number",
+						"description": "Shorthand for scanning one block."
+					},
+					"response": []
+				},
+				{
+					"name": "Native transfer histories (block range)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fromBlockNumber\": {{from_block_number}},\n    \"toBlockNumber\": {{to_block_number}}\n}"
+						},
+						"url": "{{base_url}}/get-native-transfer-histories-by-block-number",
+						"description": "Native transfers with empty input data. Returns `transactions`, `last_block`."
+					},
+					"response": []
+				},
+				{
+					"name": "Native transfer histories (single block)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"blockNumber\": {{block_number}}\n}"
+						},
+						"url": "{{base_url}}/get-native-transfer-histories-by-block-number",
+						"description": "Shorthand for scanning one block."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
