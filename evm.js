@@ -161,17 +161,11 @@ api.get('/check', (req, res) => {
     });
 });
 
-/**
- * Test Route
- */
-api.get('/test', (req, res) => {
-    return res.json({ message: '!! Hello World !!' });
-});
 
 /**
  * Test RPC connectivity (uses EVM_RPC_URL from env)
  */
-api.post('/test', async (req, res) => {
+api.post('/test-rpc', async (req, res) => {
     try {
         const latestBlock = await provider.getBlock('latest');
 
