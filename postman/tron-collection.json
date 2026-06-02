@@ -1,0 +1,72 @@
+{
+  "info": {
+    "_postman_id": "1f5a3f4d-37e0-4cd2-91d8-d64f8a5c70ab",
+    "name": "Blockchain Network - TRON Service",
+    "description": "HTTP API collection for tron.js service.\n\nBase URL defaults to http://localhost:5002/api.\nMost endpoints return JSON objects on success or boolean false on failure.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5002/api" },
+    { "key": "address", "value": "TQf6E1PEQ7s6oh6f3v9c2Q3x8w7xRr9H5P" },
+    { "key": "to_address", "value": "TQf6E1PEQ7s6oh6f3v9c2Q3x8w7xRr9H5P" },
+    { "key": "token_address", "value": "TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj" },
+    { "key": "private_key", "value": "" },
+    { "key": "tx_hash", "value": "" },
+    { "key": "amount", "value": "1" },
+    { "key": "from_block_number", "value": "50000000" },
+    { "key": "to_block_number", "value": "50000005" },
+    { "key": "block_number", "value": "50000000" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        { "name": "Check", "request": { "method": "GET", "url": "{{base_url}}/check" } },
+        { "name": "Test RPC", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{}" }, "url": "{{base_url}}/test-rpc" } }
+      ]
+    },
+    {
+      "name": "Wallet",
+      "item": [
+        { "name": "Generate wallet", "request": { "method": "GET", "url": "{{base_url}}/generate-wallet" } },
+        { "name": "Wallet from private key", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"privateKey\": \"{{private_key}}\"\n}" }, "url": "{{base_url}}/get-wallet-from-private-key" } },
+        { "name": "Check address", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"address\": \"{{address}}\"\n}" }, "url": "{{base_url}}/check-address" } }
+      ]
+    },
+    {
+      "name": "Balance",
+      "item": [
+        { "name": "Get native balance", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"address\": \"{{address}}\"\n}" }, "url": "{{base_url}}/get-native-balance" } },
+        { "name": "Get token balance", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"address\": \"{{address}}\",\n  \"tokenAddress\": \"{{token_address}}\"\n}" }, "url": "{{base_url}}/get-token-balance" } }
+      ]
+    },
+    {
+      "name": "Send",
+      "item": [
+        { "name": "Send native", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"privateKey\": \"{{private_key}}\",\n  \"toAddress\": \"{{to_address}}\",\n  \"amount\": \"{{amount}}\"\n}" }, "url": "{{base_url}}/send-native-balance" } },
+        { "name": "Send token", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"privateKey\": \"{{private_key}}\",\n  \"tokenAddress\": \"{{token_address}}\",\n  \"toAddress\": \"{{to_address}}\",\n  \"amount\": \"{{amount}}\"\n}" }, "url": "{{base_url}}/send-token-balance" } }
+      ]
+    },
+    {
+      "name": "Blocks",
+      "item": [
+        { "name": "Latest block (GET)", "request": { "method": "GET", "url": "{{base_url}}/get-latest-block" } },
+        { "name": "Latest block (POST)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{}" }, "url": "{{base_url}}/get-latest-block" } }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        { "name": "Get native transaction", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"txHash\": \"{{tx_hash}}\"\n}" }, "url": "{{base_url}}/get-native-transaction" } },
+        { "name": "Get token transaction", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"txHash\": \"{{tx_hash}}\",\n  \"tokenAddress\": \"{{token_address}}\"\n}" }, "url": "{{base_url}}/get-token-transaction" } }
+      ]
+    },
+    {
+      "name": "History",
+      "item": [
+        { "name": "Token transfers by range", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"tokenAddress\": \"{{token_address}}\",\n  \"fromBlockNumber\": {{from_block_number}},\n  \"toBlockNumber\": {{to_block_number}}\n}" }, "url": "{{base_url}}/get-token-transfer-histories-by-block-number" } },
+        { "name": "Native transfers by range", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fromBlockNumber\": {{from_block_number}},\n  \"toBlockNumber\": {{to_block_number}}\n}" }, "url": "{{base_url}}/get-native-transfer-histories-by-block-number" } }
+      ]
+    }
+  ]
+}

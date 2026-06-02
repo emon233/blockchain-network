@@ -5,6 +5,8 @@
   "main": "evm.js",
   "scripts": {
     "start": "node evm.js",
+    "start:evm": "node evm.js",
+    "start:tron": "node tron.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +16,7 @@
     "dotenv": "^16.5.0",
     "ethers": "^6.14.3",
     "express": "^5.1.0",
+    "tronweb": "^6.3.0",
     "viem": "^2.30.6",
     "web3": "^4.16.0"
   }
