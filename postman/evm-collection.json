@@ -1,56 +1,12 @@
 {
 	"info": {
-		"_postman_id": "b8e4f1a2-3c5d-4e6f-9a0b-1c2d3e4f5a6b",
+		"_postman_id": "3d28f45c-f1c6-4af0-9d9e-49483916c88d",
 		"name": "Blockchain Network — EVM Service",
 		"description": "HTTP API for the single-chain EVM microservice (`evm.js`).\n\n**Setup:** Copy `.env.example` to `.env`, set `EVM_RPC_URL`, `EVM_PAID_RPC_URL`, `EVM_CHAIN_ID`, `EVM_PORT`, then run `npm start`.\n\n**Base URL:** Default `http://localhost:5000/api` (collection variable `base_url`).\n\n**Responses:** Most endpoints return JSON objects on success or the literal `false` on failure (HTTP 200).\n\n**History endpoints** require `EVM_PAID_RPC_URL`. Block scans are limited by `EVM_MAX_BLOCK_RANGE` (default 2000).\n\n**Security:** Send endpoints accept private keys in the body — use only on trusted networks.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43941105",
+		"_collection_link": "https://growtechbd.postman.co/workspace/1usdtgame~28c9db2e-d901-408c-bd15-8549567ee506/collection/43941105-3d28f45c-f1c6-4af0-9d9e-49483916c88d?action=share&source=collection_link&creator=43941105"
 	},
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:5000/api"
-		},
-		{
-			"key": "address",
-			"value": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
-		},
-		{
-			"key": "token_address",
-			"value": "0x337610d27c682E977C6a90AeAfb39f88bf6EB81"
-		},
-		{
-			"key": "private_key",
-			"value": ""
-		},
-		{
-			"key": "public_key",
-			"value": ""
-		},
-		{
-			"key": "to_address",
-			"value": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
-		},
-		{
-			"key": "amount",
-			"value": "0.001"
-		},
-		{
-			"key": "tx_hash",
-			"value": "0x0000000000000000000000000000000000000000000000000000000000000000"
-		},
-		{
-			"key": "from_block_number",
-			"value": "1000000"
-		},
-		{
-			"key": "to_block_number",
-			"value": "1000010"
-		},
-		{
-			"key": "block_number",
-			"value": "1000000"
-		}
-	],
 	"item": [
 		{
 			"name": "Health",
@@ -65,25 +21,75 @@
 								"value": "application/json"
 							}
 						],
-						"url": "{{base_url}}/check",
+						"url": {
+							"raw": "{{base_url}}/check",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"check"
+							]
+						},
 						"description": "Service health. Returns `message`, `rpcConfigured`, `paidRpcConfigured`, `chainId`."
 					},
-					"response": []
-				},
-				{
-					"name": "Test (hello)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"url": "{{base_url}}/test",
-						"description": "Static hello response."
-					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/check",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"check"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "90"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"5a-F5B1WDm7kT8MnTTXhG+aUylVyi4\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 26 May 2026 15:47:04 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"!! Hello World !!\",\n    \"rpcConfigured\": true,\n    \"paidRpcConfigured\": true,\n    \"chainId\": 97\n}"
+						}
+					]
 				},
 				{
 					"name": "Test RPC connectivity",
@@ -101,12 +107,85 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{}"
+							"raw": ""
 						},
-						"url": "{{base_url}}/test",
+						"url": {
+							"raw": "{{base_url}}/test-rpc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"test-rpc"
+							]
+						},
 						"description": "Fetches latest block using `EVM_RPC_URL`. Returns `latestBlock` and `hash`."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{base_url}}/test-rpc",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"test-rpc"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "101"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"65-YsK9Ky6ERy3afvz3BQ3oi5xODAc\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:08:06 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"latestBlock\": 112796034,\n    \"hash\": \"0xe57c88eb807d3e5b3dbb36bd737a705fa2518fa6fc292be551e1afd14510a8e6\"\n}"
+						}
+					]
 				}
 			]
 		},
@@ -143,10 +222,75 @@
 								"value": "application/json"
 							}
 						],
-						"url": "{{base_url}}/generate-wallet",
+						"url": {
+							"raw": "{{base_url}}/generate-wallet",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"generate-wallet"
+							]
+						},
 						"description": "Creates a random wallet. Returns `address`, `privateKey`, `mnemonic`, `publicKey`."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/generate-wallet",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"generate-wallet"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "375"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"177-vsOy1wqjsPBF213qcwyph/TbkvU\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:10:05 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"address\": \"0x8B9732E282Ba198e56F442538638bcF4Ab4d810E\",\n    \"privateKey\": \"0x591157c2e965de8e9ebdbf5bd1a49a26ada682122678ee05a0202672778c2fb1\",\n    \"mnemonic\": \"apology cost that soft trap apart elephant actual walnut unfold spoon foster\",\n    \"publicKey\": \"0x04fc3482ff531262ce51ea8e0149815a14a90cf239624900ba777caeab279aca7062a0cdd524d0b5b86e48a283ea49d30612477891d429e8d73ecfd8c3ee1f37ed\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get wallet from private key",
@@ -166,10 +310,83 @@
 							"mode": "raw",
 							"raw": "{\n    \"privateKey\": \"{{private_key}}\"\n}"
 						},
-						"url": "{{base_url}}/get-wallet-from-private-key",
+						"url": {
+							"raw": "{{base_url}}/get-wallet-from-private-key",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-wallet-from-private-key"
+							]
+						},
 						"description": "Derives wallet fields from a private key (with or without `0x` prefix)."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"privateKey\": \"{{private_key}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-wallet-from-private-key",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-wallet-from-private-key"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "285"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"11d-+oHX46SgS/xopKg3xAfNmA+q8zU\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:10:47 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"address\": \"0x8B9732E282Ba198e56F442538638bcF4Ab4d810E\",\n    \"privateKey\": \"0x591157c2e965de8e9ebdbf5bd1a49a26ada682122678ee05a0202672778c2fb1\",\n    \"publicKey\": \"0x04fc3482ff531262ce51ea8e0149815a14a90cf239624900ba777caeab279aca7062a0cdd524d0b5b86e48a283ea49d30612477891d429e8d73ecfd8c3ee1f37ed\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get address from public key",
@@ -189,10 +406,83 @@
 							"mode": "raw",
 							"raw": "{\n    \"publicKey\": \"{{public_key}}\"\n}"
 						},
-						"url": "{{base_url}}/get-address-from-public-key",
+						"url": {
+							"raw": "{{base_url}}/get-address-from-public-key",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-address-from-public-key"
+							]
+						},
 						"description": "Computes EVM address from an uncompressed public key."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"publicKey\": \"{{public_key}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-address-from-public-key",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-address-from-public-key"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "56"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"38-YB+MFBTeRzwCs7AjCo7IGNNxKh8\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:11:07 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"address\": \"0x8B9732E282Ba198e56F442538638bcF4Ab4d810E\"\n}"
+						}
+					]
 				}
 			]
 		},
@@ -217,10 +507,83 @@
 							"mode": "raw",
 							"raw": "{\n    \"address\": \"{{address}}\"\n}"
 						},
-						"url": "{{base_url}}/check-address",
+						"url": {
+							"raw": "{{base_url}}/check-address",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"check-address"
+							]
+						},
 						"description": "Returns `true` if the address is valid, otherwise `false`."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"address\": \"{{address}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/check-address",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"check-address"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "4"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"4-X/5TO4MPCKAyY0ipFgr6/IraRNs\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:12:19 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "true"
+						}
+					]
 				}
 			]
 		},
@@ -245,10 +608,147 @@
 							"mode": "raw",
 							"raw": "{\n    \"address\": \"{{address}}\"\n}"
 						},
-						"url": "{{base_url}}/get-native-balance",
+						"url": {
+							"raw": "{{base_url}}/get-native-balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-native-balance"
+							]
+						},
 						"description": "Native coin balance (BNB, ETH, etc.) for the configured chain."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"address\": \"{{address}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-native-balance",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-native-balance"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "25"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"19-WiLHKwNENb5uKqXg+U5rpGGXrho\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:13:15 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"balance\": \"0.299948397\"\n}"
+						},
+						{
+							"name": "500",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"address\": \"{{address}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-native-balance",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-native-balance"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "5"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"5-fLbvuYullyqbUJDcLlF/4U0SywQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:15:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "false"
+						}
+					]
 				},
 				{
 					"name": "Get token balance",
@@ -268,10 +768,147 @@
 							"mode": "raw",
 							"raw": "{\n    \"address\": \"{{address}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
 						},
-						"url": "{{base_url}}/get-token-balance",
+						"url": {
+							"raw": "{{base_url}}/get-token-balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-token-balance"
+							]
+						},
 						"description": "ERC-20 balance. Uses token `decimals()` when available."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"address\": \"{{address}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-token-balance",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-token-balance"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "18"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"12-LNURuyOnkSuRYqVwHM0qB2n/ShE\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:14:02 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"balance\": \"15.5\"\n}"
+						},
+						{
+							"name": "500",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"address\": \"{{address}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-token-balance",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-token-balance"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "5"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"5-fLbvuYullyqbUJDcLlF/4U0SywQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 08:14:32 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "false"
+						}
+					]
 				}
 			]
 		},
@@ -296,7 +933,15 @@
 							"mode": "raw",
 							"raw": "{\n    \"privateKey\": \"{{private_key}}\",\n    \"toAddress\": \"{{to_address}}\",\n    \"amount\": \"{{amount}}\"\n}"
 						},
-						"url": "{{base_url}}/send-native-balance",
+						"url": {
+							"raw": "{{base_url}}/send-native-balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"send-native-balance"
+							]
+						},
 						"description": "Sends native coin. `amount` is a decimal string (e.g. `\"0.01\"`). **Destructive — uses real funds.**"
 					},
 					"response": []
@@ -319,7 +964,15 @@
 							"mode": "raw",
 							"raw": "{\n    \"privateKey\": \"{{private_key}}\",\n    \"tokenAddress\": \"{{token_address}}\",\n    \"toAddress\": \"{{to_address}}\",\n    \"amount\": \"{{amount}}\"\n}"
 						},
-						"url": "{{base_url}}/send-token-balance",
+						"url": {
+							"raw": "{{base_url}}/send-token-balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"send-token-balance"
+							]
+						},
 						"description": "ERC-20 transfer. **Destructive — uses real funds.**"
 					},
 					"response": []
@@ -354,10 +1007,75 @@
 								"value": "application/json"
 							}
 						],
-						"url": "{{base_url}}/get-latest-block",
+						"url": {
+							"raw": "{{base_url}}/get-latest-block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-latest-block"
+							]
+						},
 						"description": "Latest block number, hash, timestamp, transaction count."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/get-latest-block",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-latest-block"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "141"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"8d-0PEbyWrdXYCfZ6xtKDsUEwR9JAs\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:10:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"number\": 112796358,\n    \"hash\": \"0x90ed7e7730364372e299034cb37e5782f7a8fe4310ccd257f72c658a439e86d3\",\n    \"timestamp\": 1781201430,\n    \"transactionsCount\": 2\n}"
+						}
+					]
 				},
 				{
 					"name": "Get latest block (POST)",
@@ -377,10 +1095,83 @@
 							"mode": "raw",
 							"raw": "{}"
 						},
-						"url": "{{base_url}}/get-latest-block",
+						"url": {
+							"raw": "{{base_url}}/get-latest-block",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-latest-block"
+							]
+						},
 						"description": "Same as GET variant."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-latest-block",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-latest-block"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "141"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"8d-v6hT9c4foyse3pJKD6m3Zsn9YOU\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:11:10 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"number\": 112796446,\n    \"hash\": \"0xb42390c130ae519ac7207427ff1aee9e5a5335b3f60f2852b1968669c51842b0\",\n    \"timestamp\": 1781201469,\n    \"transactionsCount\": 4\n}"
+						}
+					]
 				}
 			]
 		},
@@ -403,12 +1194,85 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"txHash\": \"{{tx_hash}}\"\n}"
+							"raw": "{\n    \"txHash\": \"{{tx_hash_native}}\"\n}"
 						},
-						"url": "{{base_url}}/get-native-transaction",
+						"url": {
+							"raw": "{{base_url}}/get-native-transaction",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-native-transaction"
+							]
+						},
 						"description": "Native transfer details. Requires mined transaction (receipt present)."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"txHash\": \"{{tx_hash_native}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-native-transaction",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-native-transaction"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "217"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"d9-qY+9s8NsNQiFfSUTzopH1HkE4fc\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:15:50 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"hash\": \"0x4cc089e33ce572f4b02bf6d32dc1390ef9eccb11c66d637296e35b13f05150ba\",\n    \"from\": \"0xaa25Aa7a19f9c426E07dee59b12f944f4d9f1DD3\",\n    \"to\": \"0x9CEef68E84C0b17cb10BE4d671D9641D71175306\",\n    \"value\": \"0.3\",\n    \"blockNumber\": 106748972\n}"
+						}
+					]
 				},
 				{
 					"name": "Get token transaction",
@@ -426,12 +1290,85 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"txHash\": \"{{tx_hash}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
+							"raw": "{\n    \"txHash\": \"{{tx_hash_token}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
 						},
-						"url": "{{base_url}}/get-token-transaction",
+						"url": {
+							"raw": "{{base_url}}/get-token-transaction",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-token-transaction"
+							]
+						},
 						"description": "Parses ERC-20 Transfer events from a transaction receipt. Returns `tokenTransfers` array."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"txHash\": \"{{tx_hash_token}}\",\n    \"tokenAddress\": \"{{token_address}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-token-transaction",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-token-transaction"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "238"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"ee-0A1mB6v0Fmx7OpGvOmDyzgDhg4M\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:17:36 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"tokenTransfers\": [\n        {\n            \"hash\": \"0x7fdc6a739fa6adbae870c4de3f6566ddf1f9330ba3d4bcbfe2e7272e07427064\",\n            \"from\": \"0xEB4dBe58436017EaDf05eC1804a4862A75229A82\",\n            \"to\": \"0x9CEef68E84C0b17cb10BE4d671D9641D71175306\",\n            \"value\": \"0.5\",\n            \"blockNumber\": 111382514\n        }\n    ]\n}"
+						}
+					]
 				}
 			]
 		},
@@ -454,12 +1391,85 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"fromBlockNumber\": {{from_block_number}},\n    \"toBlockNumber\": {{to_block_number}}\n}"
+							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"fromBlockNumber\": {{from_block_number_token}},\n    \"toBlockNumber\": {{to_block_number_token}}\n}"
 						},
-						"url": "{{base_url}}/get-token-transfer-histories-by-block-number",
+						"url": {
+							"raw": "{{base_url}}/get-token-transfer-histories-by-block-number",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-token-transfer-histories-by-block-number"
+							]
+						},
 						"description": "ERC-20 Transfer logs via `EVM_PAID_RPC_URL`. Returns `transactions`, `last_block`.\n\nAlternative: use `blockNumber` alone for a single block instead of from/to."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"fromBlockNumber\": {{from_block_number_token}},\n    \"toBlockNumber\": {{to_block_number_token}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-token-transfer-histories-by-block-number",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-token-transfer-histories-by-block-number"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "347"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"15b-15MTfcXTqYzZRimhNmXrI/5t+Zc\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:29:38 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transactions\": [\n        {\n            \"from\": \"0xaa25Aa7a19f9c426E07dee59b12f944f4d9f1DD3\",\n            \"to\": \"0x9CEef68E84C0b17cb10BE4d671D9641D71175306\",\n            \"value\": \"10.0\",\n            \"blockNumber\": 111381268,\n            \"hash\": \"0x11a9281c5c9e29856dc47977daea4493ca818b834a5bdfe6af752c8908ba07d3\",\n            \"transactionHash\": \"0x11a9281c5c9e29856dc47977daea4493ca818b834a5bdfe6af752c8908ba07d3\"\n        }\n    ],\n    \"last_block\": 111381300\n}"
+						}
+					]
 				},
 				{
 					"name": "Token transfer histories (single block)",
@@ -477,12 +1487,85 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"blockNumber\": {{block_number}}\n}"
+							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"blockNumber\": {{block_number_token}}\n}"
 						},
-						"url": "{{base_url}}/get-token-transfer-histories-by-block-number",
+						"url": {
+							"raw": "{{base_url}}/get-token-transfer-histories-by-block-number",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-token-transfer-histories-by-block-number"
+							]
+						},
 						"description": "Shorthand for scanning one block."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"blockNumber\": {{block_number_token}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-token-transfer-histories-by-block-number",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-token-transfer-histories-by-block-number"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "347"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"15b-wX8u2IBU+Qw+2v6iVwoLah6ZGts\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:29:24 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transactions\": [\n        {\n            \"from\": \"0xaa25Aa7a19f9c426E07dee59b12f944f4d9f1DD3\",\n            \"to\": \"0x9CEef68E84C0b17cb10BE4d671D9641D71175306\",\n            \"value\": \"10.0\",\n            \"blockNumber\": 111381268,\n            \"hash\": \"0x11a9281c5c9e29856dc47977daea4493ca818b834a5bdfe6af752c8908ba07d3\",\n            \"transactionHash\": \"0x11a9281c5c9e29856dc47977daea4493ca818b834a5bdfe6af752c8908ba07d3\"\n        }\n    ],\n    \"last_block\": 111381268\n}"
+						}
+					]
 				},
 				{
 					"name": "Native transfer histories (block range)",
@@ -500,12 +1583,85 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"fromBlockNumber\": {{from_block_number}},\n    \"toBlockNumber\": {{to_block_number}}\n}"
+							"raw": "{\n    \"fromBlockNumber\": {{from_block_number_native}},\n    \"toBlockNumber\": {{to_block_number_native}}\n}"
 						},
-						"url": "{{base_url}}/get-native-transfer-histories-by-block-number",
+						"url": {
+							"raw": "{{base_url}}/get-native-transfer-histories-by-block-number",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-native-transfer-histories-by-block-number"
+							]
+						},
 						"description": "Native transfers with empty input data. Returns `transactions`, `last_block`."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"fromBlockNumber\": {{from_block_number_native}},\n    \"toBlockNumber\": {{to_block_number_native}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-native-transfer-histories-by-block-number",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-native-transfer-histories-by-block-number"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "282"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"11a-kjh2WhsJjEZ59rfABX139CBh9y4\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:32:40 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transactions\": [\n        {\n            \"from\": \"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3\",\n            \"to\": \"0x9ceef68e84c0b17cb10be4d671d9641d71175306\",\n            \"value\": \"0.3\",\n            \"blockNumber\": 106748972,\n            \"hash\": \"0x4cc089e33ce572f4b02bf6d32dc1390ef9eccb11c66d637296e35b13f05150ba\",\n            \"timestamp\": 1778480054\n        }\n    ],\n    \"last_block\": 106749000\n}"
+						}
+					]
 				},
 				{
 					"name": "Native transfer histories (single block)",
@@ -523,14 +1679,177 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"blockNumber\": {{block_number}}\n}"
+							"raw": "{\n    \"blockNumber\": {{block_number_native}}\n}"
 						},
-						"url": "{{base_url}}/get-native-transfer-histories-by-block-number",
+						"url": {
+							"raw": "{{base_url}}/get-native-transfer-histories-by-block-number",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-native-transfer-histories-by-block-number"
+							]
+						},
 						"description": "Shorthand for scanning one block."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "200",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"blockNumber\": {{block_number_native}}\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/get-native-transfer-histories-by-block-number",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"get-native-transfer-histories-by-block-number"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "282"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"11a-jNDU1N5UllaMcHHNhx07/wQCruw\""
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 11 Jun 2026 18:33:13 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transactions\": [\n        {\n            \"from\": \"0xaa25aa7a19f9c426e07dee59b12f944f4d9f1dd3\",\n            \"to\": \"0x9ceef68e84c0b17cb10be4d671d9641d71175306\",\n            \"value\": \"0.3\",\n            \"blockNumber\": 106748972,\n            \"hash\": \"0x4cc089e33ce572f4b02bf6d32dc1390ef9eccb11c66d637296e35b13f05150ba\",\n            \"timestamp\": 1778480054\n        }\n    ],\n    \"last_block\": 106748972\n}"
+						}
+					]
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000/api"
+		},
+		{
+			"key": "address",
+			"value": "0x8B9732E282Ba198e56F442538638bcF4Ab4d810E"
+		},
+		{
+			"key": "token_address",
+			"value": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+		},
+		{
+			"key": "private_key",
+			"value": "0x591157c2e965de8e9ebdbf5bd1a49a26ada682122678ee05a0202672778c2fb1"
+		},
+		{
+			"key": "public_key",
+			"value": "0x04fc3482ff531262ce51ea8e0149815a14a90cf239624900ba777caeab279aca7062a0cdd524d0b5b86e48a283ea49d30612477891d429e8d73ecfd8c3ee1f37ed"
+		},
+		{
+			"key": "block_number",
+			"value": "106748972"
+		},
+		{
+			"key": "to_address",
+			"value": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
+		},
+		{
+			"key": "amount",
+			"value": "0.001"
+		},
+		{
+			"key": "tx_hash_native",
+			"value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+		},
+		{
+			"key": "tx_hash_token",
+			"value": ""
+		},
+		{
+			"key": "from_block_number_native",
+			"value": "1000000"
+		},
+		{
+			"key": "to_block_number_native",
+			"value": "1000010"
+		},
+		{
+			"key": "block_number_native",
+			"value": ""
+		},
+		{
+			"key": "from_block_number_token",
+			"value": ""
+		},
+		{
+			"key": "to_block_number_token",
+			"value": ""
+		},
+		{
+			"key": "block_number_token",
+			"value": ""
 		}
 	]
 }
