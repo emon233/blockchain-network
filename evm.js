@@ -156,7 +156,9 @@ api.get('/check', (req, res) => {
     return res.json({
         message: '!! Hello World !!',
         rpcConfigured: Boolean(rpcUrl),
+        rpcUrl: rpcUrl,
         paidRpcConfigured: Boolean(paidRpcUrl),
+        paidRpcUrl: paidRpcUrl,
         chainId,
     });
 });

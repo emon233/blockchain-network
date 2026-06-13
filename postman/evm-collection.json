@@ -67,15 +67,15 @@
 								},
 								{
 									"key": "Content-Length",
-									"value": "90"
+									"value": "232"
 								},
 								{
 									"key": "ETag",
-									"value": "W/\"5a-F5B1WDm7kT8MnTTXhG+aUylVyi4\""
+									"value": "W/\"e8-vRaNjLCFBoLSuPmGsRnLWQ+Fu8A\""
 								},
 								{
 									"key": "Date",
-									"value": "Tue, 26 May 2026 15:47:04 GMT"
+									"value": "Sat, 13 Jun 2026 09:53:50 GMT"
 								},
 								{
 									"key": "Connection",
@@ -87,7 +87,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"message\": \"!! Hello World !!\",\n    \"rpcConfigured\": true,\n    \"paidRpcConfigured\": true,\n    \"chainId\": 97\n}"
+							"body": "{\n    \"message\": \"!! Hello World !!\",\n    \"rpcConfigured\": true,\n    \"rpcUrl\": \"https://data-seed-prebsc-1-s1.binance.org:8545/\",\n    \"paidRpcConfigured\": true,\n    \"paidRpcUrl\": \"https://bsc-testnet.nodereal.io/v1/ecd754ee915846adbb130675e6305247\",\n    \"chainId\": 97\n}"
 						}
 					]
 				},
@@ -95,20 +95,7 @@
 					"name": "Test RPC connectivity",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
+						"header": [],
 						"url": {
 							"raw": "{{base_url}}/test-rpc",
 							"host": [
@@ -1793,23 +1780,23 @@
 		},
 		{
 			"key": "address",
-			"value": "0x8B9732E282Ba198e56F442538638bcF4Ab4d810E"
+			"value": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0"
 		},
 		{
 			"key": "token_address",
-			"value": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+			"value": "0x337610d27c682E977C6a90AeAfb39f88bf6EB81"
 		},
 		{
 			"key": "private_key",
-			"value": "0x591157c2e965de8e9ebdbf5bd1a49a26ada682122678ee05a0202672778c2fb1"
+			"value": ""
 		},
 		{
 			"key": "public_key",
-			"value": "0x04fc3482ff531262ce51ea8e0149815a14a90cf239624900ba777caeab279aca7062a0cdd524d0b5b86e48a283ea49d30612477891d429e8d73ecfd8c3ee1f37ed"
+			"value": ""
 		},
 		{
 			"key": "block_number",
-			"value": "106748972"
+			"value": "1000000"
 		},
 		{
 			"key": "to_address",
