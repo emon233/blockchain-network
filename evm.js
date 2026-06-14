@@ -6,28 +6,22 @@ const Web3 = Web3Module.Web3;
 const express = require('express');
 const { ethers, Wallet } = require('ethers');
 
-const rpcUrl = process.env.EVM_RPC_URL;
-const paidRpcUrl = process.env.EVM_PAID_RPC_URL;
+const defaultRpcUrl = process.env.EVM_RPC_URL || null;
+const defaultPaidRpcUrl = process.env.EVM_PAID_RPC_URL || null;
+const defaultChainId = process.env.EVM_CHAIN_ID ? Number(process.env.EVM_CHAIN_ID) : null;
 const port = process.env.EVM_PORT || 5000;
-const chainId = process.env.EVM_CHAIN_ID ? Number(process.env.EVM_CHAIN_ID) : null;
 const maxBlockRange = Number(process.env.EVM_MAX_BLOCK_RANGE || 2000);
 
-if (!rpcUrl) {
-    console.error('EVM_RPC_URL environment variable is required');
-    process.exit(1);
+if (!defaultRpcUrl) {
+    console.warn('EVM_RPC_URL is not set; requests must include rpcUrl (e.g. from Laravel).');
 }
 
-if (!paidRpcUrl) {
-    console.warn('EVM_PAID_RPC_URL is not set; block history endpoints will fail');
+if (!defaultPaidRpcUrl) {
+    console.warn('EVM_PAID_RPC_URL is not set; block history may use rpcUrl or request paidRpcUrl.');
 }
 
-const app = express();
-const api = express.Router();
-app.use(express.json());
-app.use('/api', api);
-
-const provider = new ethers.JsonRpcProvider(rpcUrl);
-const paidProvider = paidRpcUrl ? new ethers.JsonRpcProvider(paidRpcUrl) : null;
+const providerCache = new Map();
+const web3Cache = new Map();
 
 const erc20Abi = [
     'function balanceOf(address owner) view returns (uint256)',
@@ -38,6 +32,51 @@ const erc20Abi = [
 const transferEventAbi = [
     'event Transfer(address indexed from, address indexed to, uint256 value)',
 ];
+
+function resolveChainConfig(source = {}) {
+    const rpcUrl = source.rpcUrl || source.rpc || defaultRpcUrl || null;
+    const paidRpcUrl = source.paidRpcUrl || source.paidRpc || source.prpcUrl || source.prpc || defaultPaidRpcUrl || rpcUrl;
+    const chainIdRaw = source.chainId ?? defaultChainId;
+    const chainId = chainIdRaw !== null && chainIdRaw !== undefined && chainIdRaw !== ''
+        ? Number(chainIdRaw)
+        : null;
+
+    return { rpcUrl, paidRpcUrl, chainId };
+}
+
+function getProvider(rpcUrl) {
+    if (!rpcUrl) {
+        return null;
+    }
+
+    if (!providerCache.has(rpcUrl)) {
+        providerCache.set(rpcUrl, new ethers.JsonRpcProvider(rpcUrl));
+    }
+
+    return providerCache.get(rpcUrl);
+}
+
+function getWeb3(rpcUrl) {
+    if (!rpcUrl) {
+        return null;
+    }
+
+    if (!web3Cache.has(rpcUrl)) {
+        web3Cache.set(rpcUrl, new Web3(rpcUrl));
+    }
+
+    return web3Cache.get(rpcUrl);
+}
+
+async function assertChainId(provider, expectedChainId) {
+    if (expectedChainId === null || expectedChainId === undefined || Number.isNaN(expectedChainId)) {
+        return true;
+    }
+
+    const network = await provider.getNetwork();
+
+    return Number(network.chainId) === Number(expectedChainId);
+}
 
 function normalizeHexAddress(address) {
     if (address === undefined || address === null) {
@@ -92,7 +131,7 @@ function normalizeTxHash(txHash) {
     return /^0x[0-9a-fA-F]{64}$/.test(withPrefix) ? withPrefix : null;
 }
 
-async function fetchLatestBlockData(blockProvider = provider) {
+async function fetchLatestBlockData(blockProvider) {
     const latestBlock = await blockProvider.getBlock('latest');
 
     if (!latestBlock) {
@@ -134,41 +173,48 @@ function parseBlockRange(fromBlockNumber, toBlockNumber, blockNumber) {
     return { from, to };
 }
 
-function handleLatestBlock(req, res) {
-    fetchLatestBlockData()
-        .then((blockData) => {
-            if (!blockData) {
-                return res.json(false);
-            }
+async function resolveChainProvider(source = {}) {
+    const chain = resolveChainConfig(source);
+    const provider = getProvider(chain.rpcUrl);
 
-            return res.json(blockData);
-        })
-        .catch((error) => {
-            console.log(`${error.toString()}`);
-            return res.json(false);
-        });
+    if (!provider) {
+        return { chain, provider: null, paidProvider: null };
+    }
+
+    if (!(await assertChainId(provider, chain.chainId))) {
+        throw new Error(`Chain ID mismatch: expected ${chain.chainId}`);
+    }
+
+    const paidProvider = getProvider(chain.paidRpcUrl);
+
+    return { chain, provider, paidProvider };
 }
 
-/**
- * Status check
- */
+const app = express();
+const api = express.Router();
+app.use(express.json());
+app.use('/api', api);
+
 api.get('/check', (req, res) => {
+    const chain = resolveChainConfig(req.query);
+
     return res.json({
         message: '!! Hello World !!',
-        rpcConfigured: Boolean(rpcUrl),
-        rpcUrl: rpcUrl,
-        paidRpcConfigured: Boolean(paidRpcUrl),
-        paidRpcUrl: paidRpcUrl,
-        chainId,
+        hybrid: true,
+        rpcConfigured: Boolean(chain.rpcUrl),
+        paidRpcConfigured: Boolean(chain.paidRpcUrl),
+        chainId: chain.chainId,
     });
 });
 
-
-/**
- * Test RPC connectivity (uses EVM_RPC_URL from env)
- */
 api.post('/test-rpc', async (req, res) => {
     try {
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
+            return res.json(false);
+        }
+
         const latestBlock = await provider.getBlock('latest');
 
         if (!latestBlock) {
@@ -185,9 +231,6 @@ api.post('/test-rpc', async (req, res) => {
     }
 });
 
-/**
- * Generate new Wallet
- */
 api.get('/generate-wallet', (req, res) => {
     try {
         const wallet = ethers.Wallet.createRandom();
@@ -204,9 +247,6 @@ api.get('/generate-wallet', (req, res) => {
     }
 });
 
-/**
- * Get Wallet info from private-key
- */
 api.post('/get-wallet-from-private-key', async (req, res) => {
     try {
         const privateKey = normalizePrivateKey(req.body.privateKey);
@@ -228,9 +268,6 @@ api.post('/get-wallet-from-private-key', async (req, res) => {
     }
 });
 
-/**
- * Get address from public key
- */
 api.post('/get-address-from-public-key', async (req, res) => {
     try {
         const publicKey = normalizePublicKey(req.body.publicKey);
@@ -241,18 +278,13 @@ api.post('/get-address-from-public-key', async (req, res) => {
 
         const address = ethers.computeAddress(publicKey);
 
-        return res.json({
-            address,
-        });
+        return res.json({ address });
     } catch (error) {
         console.log(`${error.toString()}`);
         return res.json(false);
     }
 });
 
-/**
- * Check if a given address is valid
- */
 api.post('/check-address', async (req, res) => {
     try {
         const address = normalizeHexAddress(req.body.address);
@@ -263,14 +295,17 @@ api.post('/check-address', async (req, res) => {
     }
 });
 
-/**
- * Get the native balance of an address
- */
 api.post('/get-native-balance', async (req, res) => {
     try {
         const address = normalizeHexAddress(req.body.address);
 
         if (!address) {
+            return res.json(false);
+        }
+
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
             return res.json(false);
         }
 
@@ -285,15 +320,18 @@ api.post('/get-native-balance', async (req, res) => {
     }
 });
 
-/**
- * Get the token balance of an address
- */
 api.post('/get-token-balance', async (req, res) => {
     try {
         const address = normalizeHexAddress(req.body.address);
         const tokenAddress = normalizeHexAddress(req.body.tokenAddress);
 
         if (!address || !tokenAddress) {
+            return res.json(false);
+        }
+
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
             return res.json(false);
         }
 
@@ -316,9 +354,6 @@ api.post('/get-token-balance', async (req, res) => {
     }
 });
 
-/**
- * Send native balance to given address
- */
 api.post('/send-native-balance', async (req, res) => {
     try {
         const privateKey = normalizePrivateKey(req.body.privateKey);
@@ -326,6 +361,12 @@ api.post('/send-native-balance', async (req, res) => {
         const amount = parseAmount(req.body.amount);
 
         if (!privateKey || !toAddress || !amount) {
+            return res.json(false);
+        }
+
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
             return res.json(false);
         }
 
@@ -349,9 +390,6 @@ api.post('/send-native-balance', async (req, res) => {
     }
 });
 
-/**
- * Send given token balance to given address
- */
 api.post('/send-token-balance', async (req, res) => {
     try {
         const privateKey = normalizePrivateKey(req.body.privateKey);
@@ -360,6 +398,12 @@ api.post('/send-token-balance', async (req, res) => {
         const amount = parseAmount(req.body.amount);
 
         if (!privateKey || !tokenAddress || !toAddress || !amount) {
+            return res.json(false);
+        }
+
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
             return res.json(false);
         }
 
@@ -390,20 +434,42 @@ api.post('/send-token-balance', async (req, res) => {
     }
 });
 
-/**
- * Get Latest Block
- */
+async function handleLatestBlock(req, res) {
+    try {
+        const source = req.method === 'GET' ? req.query : req.body;
+        const { provider } = await resolveChainProvider(source);
+
+        if (!provider) {
+            return res.json(false);
+        }
+
+        const blockData = await fetchLatestBlockData(provider);
+
+        if (!blockData) {
+            return res.json(false);
+        }
+
+        return res.json(blockData);
+    } catch (error) {
+        console.log(`${error.toString()}`);
+        return res.json(false);
+    }
+}
+
 api.get('/get-latest-block', handleLatestBlock);
 api.post('/get-latest-block', handleLatestBlock);
 
-/**
- * Get native transaction details by hash
- */
 api.post('/get-native-transaction', async (req, res) => {
     try {
         const txHash = normalizeTxHash(req.body.txHash);
 
         if (!txHash) {
+            return res.json(false);
+        }
+
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
             return res.json(false);
         }
 
@@ -432,15 +498,18 @@ api.post('/get-native-transaction', async (req, res) => {
     }
 });
 
-/**
- * Get token transfer details from a transaction receipt
- */
 api.post('/get-token-transaction', async (req, res) => {
     try {
         const txHash = normalizeTxHash(req.body.txHash);
         const tokenAddress = normalizeHexAddress(req.body.tokenAddress);
 
         if (!txHash || !tokenAddress) {
+            return res.json(false);
+        }
+
+        const { provider } = await resolveChainProvider(req.body);
+
+        if (!provider) {
             return res.json(false);
         }
 
@@ -483,26 +552,24 @@ api.post('/get-token-transaction', async (req, res) => {
                     to: parsed.args.to,
                     value: ethers.formatUnits(parsed.args.value, decimals),
                     blockNumber: receipt.blockNumber,
+                    logIndex: log.index,
                 });
             } catch (error) {
                 // Not a Transfer event for this token
             }
         }
 
-        return res.json({
-            tokenTransfers,
-        });
+        return res.json({ tokenTransfers });
     } catch (error) {
         console.log(`${error.toString()}`);
         return res.json(false);
     }
 });
 
-/**
- * Get token transaction histories by block number
- */
 api.post('/get-token-transfer-histories-by-block-number', async (req, res) => {
     try {
+        const { paidProvider } = await resolveChainProvider(req.body);
+
         if (!paidProvider) {
             return res.json(false);
         }
@@ -544,6 +611,7 @@ api.post('/get-token-transfer-histories-by-block-number', async (req, res) => {
                     blockNumber: Number(log.blockNumber),
                     hash: log.transactionHash,
                     transactionHash: log.transactionHash,
+                    logIndex: log.index,
                 }];
             } catch (error) {
                 console.warn(`Log parsing failed: ${log.transactionHash}`);
@@ -566,12 +634,11 @@ api.post('/get-token-transfer-histories-by-block-number', async (req, res) => {
     }
 });
 
-/**
- * Get native transfer histories by block number (single block or range)
- */
 api.post('/get-native-transfer-histories-by-block-number', async (req, res) => {
     try {
-        if (!paidRpcUrl) {
+        const chain = resolveChainConfig(req.body);
+
+        if (!chain.paidRpcUrl) {
             return res.json(false);
         }
 
@@ -584,7 +651,11 @@ api.post('/get-native-transfer-histories-by-block-number', async (req, res) => {
 
         const transactions = [];
         let lastBlock = range.to;
-        const web3 = new Web3(paidRpcUrl);
+        const web3 = getWeb3(chain.paidRpcUrl);
+
+        if (!web3) {
+            return res.json(false);
+        }
 
         for (let blockNum = range.from; blockNum <= range.to; blockNum++) {
             try {
