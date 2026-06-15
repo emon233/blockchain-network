@@ -11,6 +11,7 @@ const defaultPaidRpcUrl = process.env.EVM_PAID_RPC_URL || null;
 const defaultChainId = process.env.EVM_CHAIN_ID ? Number(process.env.EVM_CHAIN_ID) : null;
 const port = process.env.EVM_PORT || 5000;
 const maxBlockRange = Number(process.env.EVM_MAX_BLOCK_RANGE || 2000);
+const maxTopicAddresses = Number(process.env.EVM_MAX_TOPIC_ADDRESSES || 50);
 
 if (!defaultRpcUrl) {
     console.warn('EVM_RPC_URL is not set; requests must include rpcUrl (e.g. from Laravel).');
@@ -87,6 +88,103 @@ function normalizeHexAddress(address) {
     const withPrefix = trimmed.startsWith('0x') ? trimmed : `0x${trimmed}`;
 
     return ethers.isAddress(withPrefix) ? ethers.getAddress(withPrefix) : null;
+}
+
+function normalizeHexAddressList(addresses) {
+    if (addresses === undefined || addresses === null) {
+        return [];
+    }
+
+    const list = Array.isArray(addresses) ? addresses : [addresses];
+    const normalized = new Map();
+
+    for (const entry of list) {
+        const address = normalizeHexAddress(entry);
+
+        if (address) {
+            normalized.set(address.toLowerCase(), address);
+        }
+    }
+
+    return [...normalized.values()];
+}
+
+function chunkArray(items, chunkSize) {
+    if (chunkSize < 1) {
+        return [items];
+    }
+
+    const chunks = [];
+
+    for (let index = 0; index < items.length; index += chunkSize) {
+        chunks.push(items.slice(index, index + chunkSize));
+    }
+
+    return chunks;
+}
+
+function buildTransferRecipientTopics(transferTopic, toAddresses) {
+    const topics = [transferTopic, null];
+
+    if (!toAddresses || toAddresses.length === 0) {
+        return topics;
+    }
+
+    const paddedTopics = toAddresses.map((address) => ethers.zeroPadValue(address, 32));
+    topics.push(paddedTopics.length === 1 ? paddedTopics[0] : paddedTopics);
+
+    return topics;
+}
+
+async function getTokenTransferLogs(paidProvider, tokenAddress, fromBlock, toBlock, toAddresses = []) {
+    const transferTopic = ethers.id('Transfer(address,address,uint256)');
+    const addressChunks = toAddresses.length === 0
+        ? [[]]
+        : chunkArray(toAddresses, maxTopicAddresses);
+    const seen = new Set();
+    const logs = [];
+
+    for (const chunk of addressChunks) {
+        const topics = buildTransferRecipientTopics(transferTopic, chunk);
+        const chunkLogs = await paidProvider.getLogs({
+            address: tokenAddress,
+            fromBlock: BigInt(fromBlock),
+            toBlock: BigInt(toBlock),
+            topics,
+        });
+
+        for (const log of chunkLogs) {
+            const key = `${log.transactionHash}:${log.index}`;
+
+            if (!seen.has(key)) {
+                seen.add(key);
+                logs.push(log);
+            }
+        }
+    }
+
+    return logs;
+}
+
+function parseTokenTransferLogs(logs, iface, decimals) {
+    return logs.flatMap((log) => {
+        try {
+            const parsed = iface.parseLog(log);
+
+            return [{
+                from: parsed.args.from,
+                to: parsed.args.to,
+                value: ethers.formatUnits(parsed.args.value, decimals),
+                blockNumber: Number(log.blockNumber),
+                hash: log.transactionHash,
+                transactionHash: log.transactionHash,
+                logIndex: log.index,
+            }];
+        } catch (error) {
+            console.warn(`Log parsing failed: ${log.transactionHash}`);
+            return [];
+        }
+    });
 }
 
 function normalizePrivateKey(privateKey) {
@@ -578,8 +676,17 @@ api.post('/get-token-transfer-histories-by-block-number', async (req, res) => {
         const { fromBlockNumber, toBlockNumber, blockNumber } = req.body;
         const tokenAddress = normalizeHexAddress(req.body.tokenAddress);
         const range = parseBlockRange(fromBlockNumber, toBlockNumber, blockNumber);
+        const rawToAddresses = req.body.toAddresses;
+        const hasToAddressFilter = rawToAddresses !== undefined
+            && rawToAddresses !== null
+            && (Array.isArray(rawToAddresses) ? rawToAddresses.length > 0 : String(rawToAddresses).trim() !== '');
+        const toAddresses = normalizeHexAddressList(rawToAddresses);
 
         if (!tokenAddress || !range) {
+            return res.json(false);
+        }
+
+        if (hasToAddressFilter && toAddresses.length === 0) {
             return res.json(false);
         }
 
@@ -593,32 +700,16 @@ api.post('/get-token-transfer-histories-by-block-number', async (req, res) => {
         }
 
         const iface = new ethers.Interface(transferEventAbi);
-        const transferTopic = ethers.id('Transfer(address,address,uint256)');
 
-        const logs = await paidProvider.getLogs({
-            address: tokenAddress,
-            fromBlock: BigInt(range.from),
-            toBlock: BigInt(range.to),
-            topics: [transferTopic],
-        });
+        const logs = await getTokenTransferLogs(
+            paidProvider,
+            tokenAddress,
+            range.from,
+            range.to,
+            toAddresses,
+        );
 
-        const transactions = logs.flatMap((log) => {
-            try {
-                const parsed = iface.parseLog(log);
-                return [{
-                    from: parsed.args.from,
-                    to: parsed.args.to,
-                    value: ethers.formatUnits(parsed.args.value, decimals),
-                    blockNumber: Number(log.blockNumber),
-                    hash: log.transactionHash,
-                    transactionHash: log.transactionHash,
-                    logIndex: log.index,
-                }];
-            } catch (error) {
-                console.warn(`Log parsing failed: ${log.transactionHash}`);
-                return [];
-            }
-        });
+        const transactions = parseTokenTransferLogs(logs, iface, decimals);
 
         const latestBlock = await paidProvider.getBlock('latest');
         const lastBlock = latestBlock && latestBlock.number > range.to

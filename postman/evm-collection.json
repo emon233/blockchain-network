@@ -1389,7 +1389,7 @@
 								"get-token-transfer-histories-by-block-number"
 							]
 						},
-						"description": "ERC-20 Transfer logs via `EVM_PAID_RPC_URL`. Returns `transactions`, `last_block`.\n\nAlternative: use `blockNumber` alone for a single block instead of from/to."
+						"description": "ERC-20 Transfer logs via `EVM_PAID_RPC_URL`. Returns `transactions`, `last_block`.\n\nOptional `toAddresses` array filters by indexed Transfer `to` topic (OR match). Omitted = all transfers for the token in range.\n\nAlternative: use `blockNumber` alone for a single block instead of from/to."
 					},
 					"response": [
 						{
@@ -1553,6 +1553,37 @@
 							"body": "{\n    \"transactions\": [\n        {\n            \"from\": \"0xaa25Aa7a19f9c426E07dee59b12f944f4d9f1DD3\",\n            \"to\": \"0x9CEef68E84C0b17cb10BE4d671D9641D71175306\",\n            \"value\": \"10.0\",\n            \"blockNumber\": 111381268,\n            \"hash\": \"0x11a9281c5c9e29856dc47977daea4493ca818b834a5bdfe6af752c8908ba07d3\",\n            \"transactionHash\": \"0x11a9281c5c9e29856dc47977daea4493ca818b834a5bdfe6af752c8908ba07d3\"\n        }\n    ],\n    \"last_block\": 111381268\n}"
 						}
 					]
+				},
+				{
+					"name": "Token transfer histories (filter by toAddresses)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tokenAddress\": \"{{token_address}}\",\n    \"fromBlockNumber\": {{from_block_number_token}},\n    \"toBlockNumber\": {{to_block_number_token}},\n    \"toAddresses\": [\n        \"{{wallet_address}}\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/get-token-transfer-histories-by-block-number",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get-token-transfer-histories-by-block-number"
+							]
+						},
+						"description": "Same as block-range token history, but filters Transfer logs by recipient using indexed `to` topics. Large lists are chunked per `EVM_MAX_TOPIC_ADDRESSES`."
+					},
+					"response": []
 				},
 				{
 					"name": "Native transfer histories (block range)",
