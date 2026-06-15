@@ -288,7 +288,8 @@ api.post('/get-address-from-public-key', async (req, res) => {
 api.post('/check-address', async (req, res) => {
     try {
         const address = normalizeHexAddress(req.body.address);
-        return res.json(Boolean(address));
+        
+        return res.json({ isValid: Boolean(address) });
     } catch (error) {
         console.log(`${error.toString()}`);
         return res.json(false);
