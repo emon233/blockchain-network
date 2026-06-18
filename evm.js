@@ -790,6 +790,12 @@ api.post('/get-native-transfer-histories-by-block-number', async (req, res) => {
     }
 });
 
+require('./evm-vrf')(api, {
+    resolveChainProvider,
+    normalizePrivateKey,
+    normalizeHexAddress,
+});
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

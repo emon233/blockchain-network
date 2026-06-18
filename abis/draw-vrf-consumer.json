@@ -1,0 +1,11 @@
+[
+  "function requestDraw(bytes32 productDrawId) external returns (uint256 requestId)",
+  "function getRequestId(bytes32 productDrawId) external view returns (uint256)",
+  "function getRandomWords(uint256 requestId) external view returns (uint256[])",
+  "function requestFulfilled(uint256 requestId) external view returns (bool)",
+  "function requestDrawIds(uint256 requestId) external view returns (bytes32)",
+  "function drawRequestIds(bytes32 productDrawId) external view returns (uint256)",
+  "function owner() external view returns (address)",
+  "event DrawRandomnessRequested(bytes32 indexed productDrawId, uint256 indexed requestId, address indexed requester)",
+  "event DrawRandomnessFulfilled(bytes32 indexed productDrawId, uint256 indexed requestId, uint256[] randomWords)"
+]
