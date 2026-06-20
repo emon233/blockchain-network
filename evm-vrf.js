@@ -48,8 +48,20 @@ module.exports = function registerVrfRoutes(api, helpers) {
             const privateKey = normalizePrivateKey(req.body.privateKey);
             const contractAddress = normalizeHexAddress(req.body.contractAddress);
             const productDrawId = normalizeBytes32(req.body.productDrawId);
+            const productName = String(req.body.productName ?? '').trim();
+            const ticketsRegistered = Number.parseInt(String(req.body.ticketsRegistered ?? ''), 10);
+            const ticketsSold = Number.parseInt(String(req.body.ticketsSold ?? ''), 10);
 
-            if (!privateKey || !contractAddress || !productDrawId) {
+            if (
+                !privateKey
+                || !contractAddress
+                || !productDrawId
+                || productName === ''
+                || !Number.isFinite(ticketsRegistered)
+                || ticketsRegistered <= 0
+                || !Number.isFinite(ticketsSold)
+                || ticketsSold > ticketsRegistered
+            ) {
                 return res.json(false);
             }
 
@@ -61,7 +73,12 @@ module.exports = function registerVrfRoutes(api, helpers) {
 
             const wallet = new ethers.Wallet(privateKey, provider);
             const contract = new ethers.Contract(contractAddress, drawVrfConsumerAbi, wallet);
-            const txResponse = await contract.requestDraw(productDrawId);
+            const txResponse = await contract.requestDraw(
+                productDrawId,
+                productName,
+                ticketsRegistered,
+                ticketsSold,
+            );
             const receipt = await txResponse.wait();
             const requested = parseDrawRandomnessRequested(receipt, contract);
 
@@ -121,13 +138,29 @@ module.exports = function registerVrfRoutes(api, helpers) {
                 : [];
             const mappedProductDrawId = productDrawId ?? await contract.requestDrawIds(requestId);
 
-            return res.json({
+            const response = {
                 contractAddress,
                 productDrawId: mappedProductDrawId,
                 requestId,
                 fulfilled,
                 randomWords,
-            });
+            };
+
+            if (fulfilled && mappedProductDrawId) {
+                const record = await contract.drawRecords(mappedProductDrawId);
+
+                response.drawRecord = {
+                    productName: record.productName,
+                    ticketsRegistered: Number(record.ticketsRegistered),
+                    ticketsSold: Number(record.ticketsSold),
+                    randomWord: record.randomWord.toString(),
+                    winnerTicketIndex: Number(record.winnerTicketIndex),
+                    winnerTicketNumber: Number(record.winnerTicketNumber),
+                    fulfilled: record.fulfilled,
+                };
+            }
+
+            return res.json(response);
         } catch (error) {
             console.log(`vrf/draw-status: ${error.toString()}`);
             return res.json(false);

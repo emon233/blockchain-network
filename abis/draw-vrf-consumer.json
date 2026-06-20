@@ -1,11 +1,12 @@
 [
-  "function requestDraw(bytes32 productDrawId) external returns (uint256 requestId)",
+  "function requestDraw(bytes32 productDrawId, string productName, uint32 ticketsRegistered, uint32 ticketsSold) external returns (uint256 requestId)",
   "function getRequestId(bytes32 productDrawId) external view returns (uint256)",
   "function getRandomWords(uint256 requestId) external view returns (uint256[])",
   "function requestFulfilled(uint256 requestId) external view returns (bool)",
   "function requestDrawIds(uint256 requestId) external view returns (bytes32)",
   "function drawRequestIds(bytes32 productDrawId) external view returns (uint256)",
+  "function drawRecords(bytes32 productDrawId) external view returns (string productName, uint32 ticketsRegistered, uint32 ticketsSold, uint256 randomWord, uint32 winnerTicketIndex, uint32 winnerTicketNumber, bool fulfilled)",
   "function owner() external view returns (address)",
-  "event DrawRandomnessRequested(bytes32 indexed productDrawId, uint256 indexed requestId, address indexed requester)",
-  "event DrawRandomnessFulfilled(bytes32 indexed productDrawId, uint256 indexed requestId, uint256[] randomWords)"
+  "event DrawRandomnessRequested(bytes32 indexed productDrawId, uint256 indexed requestId, address indexed requester, string productName, uint32 ticketsRegistered, uint32 ticketsSold)",
+  "event DrawRandomnessFulfilled(bytes32 indexed productDrawId, uint256 indexed requestId, uint256 randomWord, uint32 winnerTicketIndex, uint32 winnerTicketNumber)"
 ]
