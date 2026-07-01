@@ -592,6 +592,6 @@ api.post('/get-native-transfer-histories-by-block-number', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`TRON server running at http://localhost:${port}`);
+app.listen(port, process.env.TRON_BIND_HOST || '127.0.0.1', () => {
+    console.log(`TRON server running at http://${process.env.TRON_BIND_HOST || '127.0.0.1'}:${port}`);
 });

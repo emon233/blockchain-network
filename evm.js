@@ -796,6 +796,6 @@ require('./evm-vrf')(api, {
     normalizeHexAddress,
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+app.listen(port, process.env.EVM_BIND_HOST || '127.0.0.1', () => {
+    console.log(`Server running at http://${process.env.EVM_BIND_HOST || '127.0.0.1'}:${port}`);
 });
